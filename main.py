@@ -15,6 +15,17 @@ import sys
 MAX_CHARS = 280
 
 
+def validate(text):
+    """The gate wants one sentence of 1-280 code points, not whitespace."""
+    if not 1 <= len(text) <= MAX_CHARS:
+        raise SystemExit(f"entry is {len(text)} characters, must be 1-{MAX_CHARS}")
+    if not text.strip():
+        raise SystemExit("entry is only white space")
+    terminators = sum(text.count(mark) for mark in ".!?")
+    if terminators != 1 or not text.rstrip().endswith((".", "!", "?")):
+        raise SystemExit("entry must be a single sentence")
+
+
 def read_bundle():
     here = os.path.dirname(os.path.abspath(__file__))
     path = os.path.join(here, "entry.txt")
@@ -25,11 +36,7 @@ def read_bundle():
 def main(argv):
     out = argv[1] if len(argv) > 1 else "/output/entry.txt"
     text = read_bundle()
-    chars = len(text)
-    if not 1 <= chars <= MAX_CHARS:
-        raise SystemExit(f"entry is {chars} characters, must be 1-{MAX_CHARS}")
-    if not text.strip():
-        raise SystemExit("entry is only white space")
+    validate(text)
     directory = os.path.dirname(out)
     if directory:
         os.makedirs(directory, exist_ok=True)
